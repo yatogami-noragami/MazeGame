@@ -62,25 +62,31 @@
 <body class="d-flex flex-column justify-content-between align-items-center vh-100 bg-light">
 
   <!-- Maze Grid -->
-  <div id="maze" class="p-3"></div>
+  <div id="maze" class="p-2 mb-5"></div>
 
   <!-- Control Buttons (Bottom) -->
-  <div id="controls" class="text-center">
+  <div id="controls" class="text-center mb-2">
     <div class="">
-      <button class="btn btn-danger rounded btn-sm mx-3" onclick="movePlayer(0, -1)">
+      <button class="btn btn-danger rounded  mx-3" id="up-btn">
         <i class="fa-regular fa-square-caret-up"></i>
       </button>
-      <button class="btn btn-info rounded btn-sm mx-3" onclick="movePlayer(0, 1)">
+      <button class="btn btn-info rounded  mx-3" id="down-btn">
         <i class="fa-regular fa-square-caret-down"></i>
       </button>
-      <button class="btn btn-warning rounded btn-sm mx-3" onclick="movePlayer(-1, 0)">
+      <button class="btn btn-warning rounded  mx-3" id="left-btn">
         <i class="fa-regular fa-square-caret-left"></i>
       </button>
-      <button class="btn btn-success rounded btn-sm mx-3" onclick="movePlayer(1, 0)">
+      <button class="btn btn-success rounded  mx-3" id="right-btn">
         <i class="fa-regular fa-square-caret-right"></i>
       </button>
 
     </div>
+  </div>
+
+  <div class=" fixed-bottom start-0 mb-2 ms-2 w-25">
+    <button class="btn btn-danger rounded" id="test" onclick="teleport()">
+      <strong class="">Teleport</strong>
+    </button>
   </div>
 
 
@@ -112,6 +118,7 @@
       x: 22,
       y: 18
     };
+
     const maze = document.getElementById('maze');
     const rows = mazeLayout.length;
     const cols = mazeLayout[0].length;
@@ -161,8 +168,8 @@
             alert('🎉 You reached the goal! Restarting the game...');
             // Reset the game by setting the player position back to start
             playerPos = {
-              x: 0,
-              y: 2
+              x: 22,
+              y: 18
             }; // Starting position
             drawMaze(); // Redraw the maze with the player at the start position
           }, 10); // Delay the restart to show the goal message
@@ -170,18 +177,79 @@
       }
     }
 
+    function Up() {
+      movePlayer(0, -1);
+    }
+
+    function Down() {
+      movePlayer(0, 1);
+    }
+
+    function Left() {
+      movePlayer(-1, 0);
+    }
+
+    function Right() {
+      movePlayer(1, 0);
+    }
+
     // Add Keyboard Arrow Key Event Listener
     window.addEventListener('keydown', function(e) {
       if (e.key === 'ArrowUp') {
-        movePlayer(0, -1);
+        Up();
       } else if (e.key === 'ArrowDown') {
-        movePlayer(0, 1);
+        Down();
       } else if (e.key === 'ArrowLeft') {
-        movePlayer(-1, 0);
+        Left();
       } else if (e.key === 'ArrowRight') {
-        movePlayer(1, 0);
+        Right();
       }
     });
+
+
+    let pressTimer;
+
+    function startLongPress(callback) {
+      pressTimer = setTimeout(() => {
+        pressTimer = setInterval(callback, 50);
+      }, 500); // Delay before starting repeated action (e.g., 300ms)
+
+      callback(); // Single call for initial press
+    }
+
+    function stopLongPress() {
+      clearTimeout(pressTimer);
+      clearInterval(pressTimer);
+    }
+
+
+    function setupLongPress(id, callback) {
+      const btn = document.getElementById(id);
+
+      // btn.addEventListener('mousedown', () => startLongPress(callback));
+      // btn.addEventListener('mouseup', stopLongPress);
+      // btn.addEventListener('mouseleave', stopLongPress);
+
+      btn.addEventListener('touchstart', () => startLongPress(callback));
+      btn.addEventListener('touchend', stopLongPress);
+      btn.addEventListener('touchcancel', stopLongPress);
+    }
+
+    // Connect buttons to direction functions
+    setupLongPress("up-btn", Up);
+    setupLongPress("down-btn", Down);
+    setupLongPress("left-btn", Left);
+    setupLongPress("right-btn", Right);
+
+    function teleport() {
+
+      playerPos = {
+        x: 38,
+        y: 17
+      };
+      drawMaze();
+    }
+
 
     drawMaze();
   </script>
